@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTTP Request Smuggling - Interactive Lab</title>
+    <!-- PixellariCyrillic font -->
+    <style>
+        @font-face {
+            font-family: 'PixellariCyrillic';
+            src: url('https://cdn.jsdelivr.net/gh/YuRaNnNzZZ/PixellariCyrillic/PixellariCyrillic.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --main-bg-color: #000000;
+            --text-color: #00ff00;
+            --secondary-color: #00aa00;
+            --highlight-color: #00ff33;
+            --border-color: #008800;
+            --dark-bg: #001100;
+            --error-color: #ff3300;
+            --warning-color: #ffaa00;
+            --success-color: #00ff66;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'PixellariCyrillic', monospace;
+        }
+
+        body {
+            background-color: var(--main-bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            font-size: 18px;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 {
+            color: var(--highlight-color);
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 32px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: flicker 2s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
+                opacity: 1;
+            }
+            20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
+                opacity: 0.8;
+            }
+        }
+
+        .panel {
+            background-color: var(--dark-bg);
+            border: 2px solid var(--border-color);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .panel-header {
+            color: var(--highlight-color);
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        button, select {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 8px 16px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        button:hover, select:hover {
+            background-color: var(--border-color);
+            color: var(--main-bg-color);
+        }
+
+        button:active {
+            transform: translateY(2px);
+        }
+
+        textarea, input {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            resize: vertical;
+            font-family: monospace;
+        }
+
+        .log-container {
+            height: 300px;
+            overflow-y: auto;
+            background-color: rgba(0, 20, 0, 0.8);
+            padding: 10px;
+            font-family: monospace;
+            border: 2px solid var(--border-color);
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .log-line {
+            margin: 0;
+            padding: 2px 0;
+            line-height: 1.5;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .highlight {
+            color: var(--highlight-color);
+            font-weight: bold;
+        }
+
+        .error {
+            color: var(--error-color);
+        }
+
+        .warning {
+            color: var(--warning-color);
+        }
+
+        .success {
+            color: var(--success-color);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 8px 16px;
+            cursor: pointer;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: var(--highlight-color);
+            border-bottom: 2px solid var(--highlight-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .visualizer {
+            display: flex;
+            padding: 15px;
+            margin-top: 20px;
+            border: 2px dashed var(--border-color);
+            position: relative;
+            min-height: 200px;
+        }
+
+        .server {
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            margin: 0 40px;
+        }
+
+        .server-title {
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .packet {
+            position: absolute;
+            width: 40px;
+            height: 25px;
+            background-color: var(--text-color);
+            border: 2px solid var(--highlight-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            animation-duration: 3s;
+            animation-fill-mode: forwards;
+            animation-timing-function: linear;
+            opacity: 0;
+        }
+
+        @keyframes moveRequestToFrontend {
+            0% { left: 10px; opacity: 1; }
+            100% { left: 150px; opacity: 1; }
+        }
+
+        @keyframes moveRequestToBackend {
+            0% { left: 290px; opacity: 1; }
+            100% { left: 430px; opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--highlight-color);
+            transition: width 0.3s;
+        }
+
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(0, 20, 0, 0.8);
+            border-left: 4px solid var(--highlight-color);
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .help-tip {
+            cursor: help;
+            color: var(--highlight-color);
+            border-bottom: 1px dotted var(--highlight-color);
+        }
+
+        /* CRT effect */
+        .crt-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            background: linear-gradient(rgba(0, 10, 0, 0.1) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            animation: scanline 10ms linear infinite;
+        }
+
+        @keyframes scanline {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 0 4px;
+            }
+        }
+
+        .crt-effect::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+            pointer-events: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background-color: var(--border-color);
+            color: var(--main-bg-color);
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .btn-step {
+            flex: 1;
+            margin-top: 10px;
+        }
+        
+        .attack-description {
+            font-style: italic;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: rgba(0, 20, 0, 0.5);
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        /* Pro Mode Styles */
+        .pro-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: var(--highlight-color);
+            color: var(--main-bg-color);
+            padding: 5px 10px;
+            font-weight: bold;
+            border-radius: 5px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background-color: var(--border-color);
+            color: var(--main-bg-color);
+        }
+
+        /* Packet Analyzer */
+        .packet-analyzer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .packet-view {
+            background-color: rgba(0, 20, 0, 0.5);
+            border: 2px solid var(--border-color);
+            padding: 10px;
+            position: relative;
+        }
+
+        .packet-title {
+            position: absolute;
+            top: -12px;
+            left: 10px;
+            background-color: var(--main-bg-color);
+            padding: 0 10px;
+            font-size: 14px;
+            color: var(--highlight-color);
+        }
+
+        .byte-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+
+        .byte {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            font-size: 12px;
+            position: relative;
+        }
+
+        .byte.frontend-boundary {
+            border: 2px solid var(--highlight-color);
+        }
+
+        .byte.backend-boundary {
+            border: 2px solid var(--error-color);
+        }
+
+        .byte-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            padding: 5px;
+            font-size: 10px;
+            white-space: nowrap;
+            visibility: hidden;
+            z-index: 10;
+        }
+
+        .byte:hover .byte-tooltip {
+            visibility: visible;
+        }
+
+        /* Request Builder */
+        .request-builder {
+            margin-top: 15px;
+        }
+
+        .method-select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+        }
+
+        .header-input {
+            display: flex;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .header-input input {
+            flex: 1;
+        }
+
+        .header-list {
+            margin-bottom: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            background-color: rgba(0, 20, 0, 0.5);
+            padding: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .header-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .remove-header {
+            background-color: var(--error-color);
+            color: var(--main-bg-color);
+            border: none;
+            padding: 2px 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Results Display */
+        .results-display {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: rgba(0, 20, 0, 0.5);
+            border: 1px solid var(--border-color);
+        }
+
+        .results-title {
+            margin-top: 0;
+            color: var(--highlight-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        .results-content {
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* Analyzer Settings */
+        .analyzer-settings {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(0, 20, 0, 0.5);
+            border: 1px solid var(--border-color);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .setting-label {
+            flex: 1;
+        }
+
+        .setting-control {
+            flex: 1;
+            text-align: right;
+        }
+
+        /* New Visualizations */
+        .request-visualization {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px dashed var(--border-color);
+        }
+
+        .parsing-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .parsing-row {
+            position: relative;
+            padding: 10px;
+            background-color: rgba(0, 20, 0, 0.5);
+            border: 1px solid var(--border-color);
+        }
+
+        .parsing-label {
+            position: absolute;
+            top: -12px;
+            left: 10px;
+            background-color: var(--main-bg-color);
+            padding: 0 10px;
+            font-size: 14px;
+            color: var(--highlight-color);
+        }
+
+        .parsing-content {
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .highlight-content {
+            position: relative;
+        }
+
+        .highlight-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: rgba(0, 255, 0, 0.2);
+            pointer-events: none;
+        }
+
+        /* New toggle switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--dark-bg);
+            transition: 0.4s;
+            border: 1px solid var(--border-color);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--text-color);
+            transition: 0.4s;
+        }
+
+        input:checked + .slider {
+            background-color: var(--border-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .slider.round {
+            border-radius: 30px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="crt-effect"></div>
+    <div class="container">
+        <div class="header">
+            <h1>HTTP REQUEST SMUGGLING LAB</h1>
+            <p>Interactive laboratory for understanding HTTP Request Smuggling vulnerabilities</p>
+        </div>
+        
+        <!-- Mode Selector -->
+        <div class="mode-selector">
+            <div class="mode-btn active" data-mode="basic">Basic Mode</div>
+            <div class="mode-btn" data-mode="pro">Professional Mode</div>
+        </div>
+        
+        <!-- Basic Mode -->
+        <div id="basic-mode">
+            <div class="panel">
+                <h3 class="panel-header">Select Attack Type</h3>
+                <div class="panel-content">
+                    <select id="attack-type">
+                        <option value="cl-te">CL.TE (Content-Length + Transfer-Encoding)</option>
+                        <option value="te-cl">TE.CL (Transfer-Encoding + Content-Length)</option>
+                        <option value="te-te">TE.TE (Dual Transfer-Encoding)</option>
+                    </select>
+                    
+                    <div class="attack-description" id="attack-description">
+                        The CL.TE attack exploits inconsistencies between Content-Length processing on the frontend server and Transfer-Encoding processing on the backend server.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid">
+                <div class="panel">
+                    <h3 class="panel-header">Request Editor</h3>
+                    <div class="panel-content">
+                        <div class="tabs">
+                            <button class="tab active" data-tab="tab-normal">Normal Request</button>
+                            <button class="tab" data-tab="tab-exploit">Exploit Request</button>
+                            <button class="tab" data-tab="tab-custom">Custom Request</button>
+                        </div>
+                        
+                        <div class="tab-content active" id="tab-normal">
+                            <textarea id="normal-request" rows="8">GET /page HTTP/1.1
+Host: example.com
+User-Agent: Mozilla/5.0
+Accept: text/html
+Connection: close</textarea>
+                        </div>
+                        
+                        <div class="tab-content" id="tab-exploit">
+                            <textarea id="exploit-request" rows="8">POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G</textarea>
+                        </div>
+                        
+                        <div class="tab-content" id="tab-custom">
+                            <textarea id="custom-request" rows="8">POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G</textarea>
+                            <div class="controls">
+                                <button id="btn-validate">Validate Request</button>
+                            </div>
+                        </div>
+                        
+                        <div class="controls">
+                            <button id="btn-send">Send Request</button>
+                            <button id="btn-reset">Reset</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h3 class="panel-header">Event Log</h3>
+                    <div class="log-container" id="log-container">
+                        <p class="log-line">System ready to process requests...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3 class="panel-header">Request Processing Simulation</h3>
+                <div class="visualizer">
+                    <div class="server">
+                        <div class="server-title">Client</div>
+                        <svg width="80" height="80" viewBox="0 0 24 24">
+                            <rect x="4" y="6" width="16" height="12" fill="none" stroke="#00ff00" stroke-width="1" />
+                            <line x1="4" y1="9" x2="20" y2="9" stroke="#00ff00" stroke-width="1" />
+                            <rect x="8" y="12" width="8" height="4" fill="#001100" stroke="#00ff00" stroke-width="1" />
+                        </svg>
+                    </div>
+                    
+                    <div class="server">
+                        <div class="server-title">Frontend</div>
+                        <svg width="80" height="80" viewBox="0 0 24 24">
+                            <rect x="2" y="2" width="20" height="20" fill="none" stroke="#00ff00" stroke-width="1" />
+                            <line x1="2" y1="6" x2="22" y2="6" stroke="#00ff00" stroke-width="1" />
+                            <rect x="5" y="10" width="14" height="2" fill="#00ff00" stroke="#00ff00" stroke-width="0.5" />
+                            <rect x="5" y="14" width="14" height="2" fill="#00ff00" stroke="#00ff00" stroke-width="0.5" />
+                        </svg>
+                    </div>
+                    
+                    <div class="server">
+                        <div class="server-title">Backend</div>
+                        <svg width="80" height="80" viewBox="0 0 24 24">
+                            <rect x="2" y="2" width="20" height="20" fill="none" stroke="#00ff00" stroke-width="1" />
+                            <circle cx="12" cy="12" r="6" fill="none" stroke="#00ff00" stroke-width="1" />
+                            <circle cx="12" cy="12" r="2" fill="#00ff00" />
+                        </svg>
+                    </div>
+                    
+                    <div id="packet-container"></div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                
+                <div class="controls">
+                    <button id="btn-step" class="btn-step">Next Step ▶</button>
+                </div>
+            </div>
+            
+            <!-- New Visualization Panel -->
+            <div class="panel">
+                <h3 class="panel-header">Request Boundary Visualization</h3>
+                <div class="request-visualization">
+                    <div class="parsing-diagram">
+                        <div class="parsing-row">
+                            <div class="parsing-label">Raw Request</div>
+                            <div class="parsing-content" id="raw-request">POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G</div>
+                        </div>
+                        <div class="parsing-row">
+                            <div class="parsing-label">Frontend Interpretation</div>
+                            <div class="parsing-content highlight-content" id="frontend-interpretation">
+                                <div class="highlight-overlay" style="width: 80%;"></div>
+                                POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G
+                            </div>
+                        </div>
+                        <div class="parsing-row">
+                            <div class="parsing-label">Backend Interpretation</div>
+                            <div class="parsing-content highlight-content" id="backend-interpretation">
+                                <div class="highlight-overlay" style="width: 60%;"></div>
+                                POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3 class="panel-header">Attack Explanation</h3>
+                <div class="explanation" id="explanation-container">
+                    <p>HTTP Request Smuggling is an attack technique that exploits inconsistencies in how multi-request HTTP messages are interpreted between proxy servers and application servers.</p>
+                    <p>In the <span class="highlight">CL.TE</span> scenario:</p>
+                    <ul>
+                        <li>The frontend server processes the <span class="highlight">Content-Length</span> header</li>
+                        <li>The backend server processes the <span class="highlight">Transfer-Encoding: chunked</span> header</li>
+                        <li>This inconsistency allows part of the request to be "smuggled" and injected into the beginning of the next request</li>
+                    </ul>
+                    <p>Click "Next Step" for a step-by-step visualization of the attack.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pro Mode -->
+        <div id="pro-mode" class="hidden">
+            <div class="panel">
+                <div class="pro-badge">PRO</div>
+                <h3 class="panel-header">HTTP Request Smuggling Analyzer</h3>
+                <div class="panel-content">
+                    <div class="attack-description">
+                        This professional analyzer allows you to craft custom HTTP requests and see how they're interpreted differently by frontend and backend servers, helping identify smuggling vulnerabilities.
+                    </div>
+                    
+                    <div class="analyzer-settings">
+                        <div class="setting-item">
+                            <div class="setting-label">Frontend Server Type:</div>
+                            <div class="setting-control">
+                                <select id="frontend-type">
+                                    <option value="nginx">Nginx</option>
+                                    <option value="haproxy">HAProxy</option>
+                                    <option value="apache">Apache</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">Backend Server Type:</div>
+                            <div class="setting-control">
+                                <select id="backend-type">
+                                    <option value="tomcat">Tomcat</option>
+                                    <option value="iis">IIS</option>
+                                    <option value="nodejs">Node.js</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">Simulate Burp Suite HTTP History:</div>
+                            <div class="setting-control">
+                                <label class="switch">
+                                    <input type="checkbox" id="burp-mode">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Request Builder -->
+                    <div class="request-builder">
+                        <h4>Request Builder</h4>
+                        
+                        <select class="method-select" id="request-method">
+                            <option value="GET">GET</option>
+                            <option value="POST" selected>POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                        </select>
+                        
+                        <input type="text" id="request-path" placeholder="Request path (e.g., /api/data)" value="/">
+                        
+                        <div class="header-input">
+                            <input type="text" id="header-name" placeholder="Header name">
+                            <input type="text" id="header-value" placeholder="Header value">
+                            <button id="add-header">Add</button>
+                        </div>
+                        
+                        <div class="header-list" id="header-list">
+                            <div class="header-item">
+                                <span>Host: example.com</span>
+                                <button class="remove-header" data-header="Host">×</button>
+                            </div>
+                        </div>
+                        
+                        <textarea id="request-body" rows="6" placeholder="Request body"></textarea>
+                        
+                        <div class="controls">
+                            <button id="analyze-request">Analyze Request</button>
+                            <button id="clear-request">Clear</button>
+                            <button id="generate-exploit" class="highlight">Generate Exploit</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Packet Analyzer -->
+                    <div class="packet-analyzer">
+                        <div class="packet-view">
+                            <div class="packet-title">Frontend Interpretation</div>
+                            <div id="frontend-view" class="parsing-content">
+                                Waiting for request analysis...
+                            </div>
+                            <div class="byte-container" id="frontend-bytes">
+                                <!-- Bytes will be added here dynamically -->
+                            </div>
+                        </div>
+                        
+                        <div class="packet-view">
+                            <div class="packet-title">Backend Interpretation</div>
+                            <div id="backend-view" class="parsing-content">
+                                Waiting for request analysis...
+                            </div>
+                            <div class="byte-container" id="backend-bytes">
+                                <!-- Bytes will be added here dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Display -->
+                    <div class="results-display">
+                        <h4 class="results-title">Vulnerability Analysis</h4>
+                        <div class="results-content" id="vulnerability-analysis">
+                            Run the analysis to detect potential HTTP Request Smuggling vulnerabilities.
+                        </div>
+                    </div>
+                    
+                    <!-- Burp Suite Integration -->
+                    <div id="burp-container" class="hidden">
+                        <h4>Burp Suite HTTP History</h4>
+                        <div class="log-container" id="burp-log">
+                            <p class="log-line">[+] Burp Suite integration active</p>
+                            <p class="log-line">[+] Send requests to analyze potential smuggling vulnerabilities</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Advanced Explanation Panel -->
+            <div class="panel">
+                <h3 class="panel-header">Advanced HTTP Request Smuggling Techniques</h3>
+                <div class="explanation" id="pro-explanation">
+                    <p>HTTP Request Smuggling vulnerabilities arise from inconsistencies in how different servers parse and interpret HTTP requests, especially when dealing with request boundaries.</p>
+                    
+                    <h4>Key Mechanisms</h4>
+                    <ul>
+                        <li><span class="highlight">Content-Length (CL)</span>: Specifies the exact length of the request body in bytes</li>
+                        <li><span class="highlight">Transfer-Encoding (TE)</span>: Indicates the encoding used to transfer the entity to the user, with chunked encoding being particularly relevant</li>
+                    </ul>
+                    
+                    <h4>Main Vulnerability Types</h4>
+                    <ul>
+                        <li><span class="highlight">CL.TE</span>: Frontend uses Content-Length, backend uses Transfer-Encoding</li>
+                        <li><span class="highlight">TE.CL</span>: Frontend uses Transfer-Encoding, backend uses Content-Length</li>
+                        <li><span class="highlight">TE.TE</span>: Both servers use Transfer-Encoding but interpret non-standard TE headers differently</li>
+                    </ul>
+                    
+                    <h4>Real-World Impact</h4>
+                    <p>These vulnerabilities can lead to:</p>
+                    <ul>
+                        <li>Request/response queue poisoning</li>
+                        <li>Web cache poisoning</li>
+                        <li>Session fixation</li>
+                        <li>Cross-site scripting (XSS)</li>
+                        <li>Bypassing security controls</li>
+                    </ul>
+                    
+                    <p>Use the professional analyzer above to craft and test potential exploit requests.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>HTTP Request Smuggling Lab | Interactive Training Environment | 2025</p>
+        </div>
+    </div>
+
+    <script>
+        // Attack descriptions objects
+        const attackDescriptions = {
+            'cl-te': 'The CL.TE attack exploits inconsistencies between Content-Length processing on the frontend server and Transfer-Encoding processing on the backend server.',
+            'te-cl': 'The TE.CL attack exploits inconsistencies between Transfer-Encoding processing on the frontend server and Content-Length processing on the backend server.',
+            'te-te': 'The TE.TE attack exploits differences in non-standard Transfer-Encoding header processing between frontend and backend servers.'
+        };
+
+        // Request templates for different attacks
+        const requestTemplates = {
+            'cl-te': {
+                normal: `GET /page HTTP/1.1
+Host: example.com
+User-Agent: Mozilla/5.0
+Accept: text/html
+Connection: close`,
+                exploit: `POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G`  
+            },
+            'te-cl': {
+                normal: `GET /page HTTP/1.1
+Host: example.com
+User-Agent: Mozilla/5.0
+Accept: text/html
+Connection: close`,
+                exploit: `POST / HTTP/1.1
+Host: example.com
+Content-Length: 4
+Transfer-Encoding: chunked
+
+12
+SMUGGLED REQUEST
+0
+
+`
+            },
+            'te-te': {
+                normal: `GET /page HTTP/1.1
+Host: example.com
+User-Agent: Mozilla/5.0
+Accept: text/html
+Connection: close`,
+                exploit: `POST / HTTP/1.1
+Host: example.com
+Transfer-Encoding: chunked
+Transfer-Encoding: identity
+
+5
+AAAAA
+0
+
+`
+            }
+        };
+
+        // Attack step explanations
+        const attackSteps = {
+            'cl-te': [
+                {
+                    explanation: 'Client prepares a malicious request with conflicting Content-Length and Transfer-Encoding headers',
+                    log: 'Client forms a request with Content-Length: 6 and Transfer-Encoding: chunked'
+                },
+                {
+                    explanation: 'Client sends the request to the frontend server',
+                    log: '> Sending request to frontend server'
+                },
+                {
+                    explanation: 'Frontend server processes the request according to Content-Length and sees 6 bytes of request body',
+                    log: '> Frontend sees Content-Length: 6 and considers the body to consist of "0\\n\\nG"'
+                },
+                {
+                    explanation: 'Frontend server forwards the request to the backend server',
+                    log: '> Forwarding request to backend server'
+                },
+                {
+                    explanation: 'Backend server processes the request according to Transfer-Encoding: chunked',
+                    log: '> Backend sees Transfer-Encoding: chunked and processes "0" as chunk size'
+                },
+                {
+                    explanation: 'Backend interprets "0" as an empty chunk that ends the request',
+                    log: '> Backend considers the request complete at "0\\n\\n"'
+                },
+                {
+                    explanation: 'The remaining "G" character stays in the backend server buffer and will be considered as the start of the next request',
+                    log: '> Remaining "G" character will be interpreted as the beginning of the next request!'
+                },
+                {
+                    explanation: 'When the next legitimate request arrives at the backend, it is combined with the remaining "G" character',
+                    log: '> Next legitimate request "GET /page HTTP/1.1" becomes "GET /page HTTP/1.1"'
+                },
+                {
+                    explanation: 'This is a successful HTTP Request Smuggling attack. In a real scenario, you could inject a complete malicious request.',
+                    log: '✓ CL.TE attack successfully executed! Request was "smuggled" through the frontend to the backend.'
+                }
+            ],
+            'te-cl': [
+                {
+                    explanation: 'Client prepares a malicious request with conflicting Transfer-Encoding and Content-Length headers',
+                    log: 'Client forms a request with Transfer-Encoding: chunked and Content-Length: 4'
+                },
+                {
+                    explanation: 'Client sends the request to the frontend server',
+                    log: '> Sending request to frontend server'
+                },
+                {
+                    explanation: 'Frontend server processes the request according to Transfer-Encoding: chunked',
+                    log: '> Frontend sees Transfer-Encoding: chunked and processes "12" as chunk size'
+                },
+                {
+                    explanation: 'Frontend interprets the request as chunked and expects it to end after the zero chunk',
+                    log: '> Frontend considers the request to contain a chunk of size 18 bytes and end at "0\\n\\n"'
+                },
+                {
+                    explanation: 'Frontend server forwards the request to the backend server',
+                    log: '> Forwarding request to backend server'
+                },
+                {
+                    explanation: 'Backend server processes the request according to Content-Length',
+                    log: '> Backend sees Content-Length: 4 and considers the body to be the first 4 bytes'
+                },
+                {
+                    explanation: 'Backend reads only 4 bytes of the body, stopping at "12\\n"',
+                    log: '> Backend considers the request complete after the first 4 bytes of the body'
+                },
+                {
+                    explanation: 'The remaining "SMUGGLED REQUEST\\n0\\n\\n" stays in the buffer and will be considered as the start of the next request',
+                    log: '> Remaining text "SMUGGLED REQUEST\\n0\\n\\n" will be interpreted as a new request!'
+                },
+                {
+                    explanation: 'This is a successful HTTP Request Smuggling attack of type TE.CL.',
+                    log: '✓ TE.CL attack successfully executed! The "SMUGGLED REQUEST" was smuggled through.'
+                }
+            ],
+            'te-te': [
+                {
+                    explanation: 'Client prepares a malicious request with two incompatible Transfer-Encoding headers',
+                    log: 'Client forms a request with Transfer-Encoding: chunked and Transfer-Encoding: identity'
+                },
+                {
+                    explanation: 'Client sends the request to the frontend server',
+                    log: '> Sending request to frontend server'
+                },
+                {
+                    explanation: 'Frontend server processes the first Transfer-Encoding: chunked header and ignores the second one',
+                    log: '> Frontend sees Transfer-Encoding: chunked and ignores Transfer-Encoding: identity'
+                },
+                {
+                    explanation: 'Frontend interprets the request as chunked and processes "5" as the size of the first chunk',
+                    log: '> Frontend considers the request to contain a chunk of size 5 bytes ("AAAAA") and end at "0\\n\\n"'
+                },
+                {
+                    explanation: 'Frontend server forwards the request to the backend server',
+                    log: '> Forwarding request to backend server'
+                },
+                {
+                    explanation: 'Backend server processes the second Transfer-Encoding: identity header and ignores the first one',
+                    log: '> Backend sees Transfer-Encoding: identity and ignores chunked mode'
+                },
+                {
+                    explanation: 'Backend reads the entire request body as regular text without chunked decoding',
+                    log: '> Backend reads "5\\nAAAAA\\n0\\n\\n" as regular content without chunk decoding'
+                },
+                {
+                    explanation: 'This allows bypassing security checks as frontend and backend interpret headers differently',
+                    log: '> The discrepancy in Transfer-Encoding processing creates a vulnerability'
+                },
+                {
+                    explanation: 'This is a successful HTTP Request Smuggling attack of type TE.TE.',
+                    log: '✓ TE.TE attack successfully executed! Servers processed the request differently due to dual Transfer-Encoding.'
+                }
+            ]
+        };
+
+        // Full explanations for each attack type
+        const fullExplanations = {
+            'cl-te': `
+                <h4>CL.TE (Content-Length + Transfer-Encoding)</h4>
+                <p>In this attack:</p>
+                <ul>
+                    <li>Frontend server uses <span class="highlight">Content-Length</span> to determine request boundaries</li>
+                    <li>Backend server uses <span class="highlight">Transfer-Encoding: chunked</span></li>
+                </ul>
+                <p>When a request contains both headers, servers interpret it differently:</p>
+                <pre>
+POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G</pre>
+                <p>Frontend sees a body of length 6 bytes, including newline characters.</p>
+                <p>Backend sees a chunked request where "0" indicates an empty chunk that ends the request.</p>
+                <p>The remaining "G" character stays in the backend server buffer and will be prepended to the next request.</p>
+            `,
+            'te-cl': `
+                <h4>TE.CL (Transfer-Encoding + Content-Length)</h4>
+                <p>In this attack:</p>
+                <ul>
+                    <li>Frontend server uses <span class="highlight">Transfer-Encoding: chunked</span> to determine request boundaries</li>
+                    <li>Backend server uses <span class="highlight">Content-Length</span></li>
+                </ul>
+                <p>The request is interpreted differently:</p>
+                <pre>
+POST / HTTP/1.1
+Host: example.com
+Content-Length: 4
+Transfer-Encoding: chunked
+
+12
+SMUGGLED REQUEST
+0
+
+</pre>
+                <p>Frontend sees a chunked request where "12" indicates a chunk of size 18 bytes.</p>
+                <p>Backend sees a body of length 4 bytes ("12\\n") and considers the request complete.</p>
+                <p>The remaining data ("SMUGGLED REQUEST\\n0\\n\\n") is interpreted by the backend as a new request.</p>
+            `,
+            'te-te': `
+                <h4>TE.TE (Dual Transfer-Encoding)</h4>
+                <p>In this attack:</p>
+                <ul>
+                    <li>Frontend and backend process multiple <span class="highlight">Transfer-Encoding</span> headers differently</li>
+                </ul>
+                <p>Example of a malicious request:</p>
+                <pre>
+POST / HTTP/1.1
+Host: example.com
+Transfer-Encoding: chunked
+Transfer-Encoding: identity
+
+5
+AAAAA
+0
+
+</pre>
+                <p>Frontend processes the first header (chunked) and considers the request to contain a chunk of size 5 bytes.</p>
+                <p>Backend processes the second header (identity) and reads the body as regular text.</p>
+                <p>This discrepancy allows bypassing security checks.</p>
+            `
+        };
+
+        // Server behaviors for the Pro mode
+        const serverBehaviors = {
+            frontend: {
+                nginx: {
+                    clVsTe: "prioritizes Transfer-Encoding over Content-Length",
+                    multipleHeaders: "uses the last Transfer-Encoding header",
+                    nonStandardHeaders: "strips spaces in header names"
+                },
+                haproxy: {
+                    clVsTe: "prioritizes Content-Length if Transfer-Encoding is not chunked",
+                    multipleHeaders: "uses the first Transfer-Encoding header",
+                    nonStandardHeaders: "sensitive to case and spaces"
+                },
+                apache: {
+                    clVsTe: "prioritizes Transfer-Encoding over Content-Length",
+                    multipleHeaders: "concatenates multiple Transfer-Encoding values",
+                    nonStandardHeaders: "normalizes header names to lowercase"
+                }
+            },
+            backend: {
+                tomcat: {
+                    clVsTe: "prioritizes Transfer-Encoding over Content-Length",
+                    multipleHeaders: "uses the first Transfer-Encoding header",
+                    nonStandardHeaders: "ignores headers with spaces"
+                },
+                iis: {
+                    clVsTe: "prioritizes Content-Length if chunked encoding is not properly formatted",
+                    multipleHeaders: "uses the last Transfer-Encoding header",
+                    nonStandardHeaders: "case-sensitive for Transfer-Encoding"
+                },
+                nodejs: {
+                    clVsTe: "prioritizes Transfer-Encoding over Content-Length",
+                    multipleHeaders: "uses the last Transfer-Encoding header",
+                    nonStandardHeaders: "normalizes header names"
+                }
+            }
+        };
+
+        // UI Interaction Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements - Basic Mode
+            const attackTypeSelect = document.getElementById('attack-type');
+            const attackDescription = document.getElementById('attack-description');
+            const normalRequest = document.getElementById('normal-request');
+            const exploitRequest = document.getElementById('exploit-request');
+            const customRequest = document.getElementById('custom-request');
+            const tabNormal = document.querySelector('[data-tab="tab-normal"]');
+            const tabExploit = document.querySelector('[data-tab="tab-exploit"]');
+            const tabCustom = document.querySelector('[data-tab="tab-custom"]');
+            const tabContentNormal = document.getElementById('tab-normal');
+            const tabContentExploit = document.getElementById('tab-exploit');
+            const tabContentCustom = document.getElementById('tab-custom');
+            const btnSend = document.getElementById('btn-send');
+            const btnReset = document.getElementById('btn-reset');
+            const btnStep = document.getElementById('btn-step');
+            const btnValidate = document.getElementById('btn-validate');
+            const logContainer = document.getElementById('log-container');
+            const progressBar = document.getElementById('progress-bar');
+            const explanationContainer = document.getElementById('explanation-container');
+            const packetContainer = document.getElementById('packet-container');
+            const rawRequest = document.getElementById('raw-request');
+            const frontendInterpretation = document.getElementById('frontend-interpretation');
+            const backendInterpretation = document.getElementById('backend-interpretation');
+            
+            // DOM elements - Mode Switching
+            const modeButtons = document.querySelectorAll('.mode-btn');
+            const basicMode = document.getElementById('basic-mode');
+            const proMode = document.getElementById('pro-mode');
+            
+            // DOM elements - Pro Mode
+            const frontendType = document.getElementById('frontend-type');
+            const backendType = document.getElementById('backend-type');
+            const burpMode = document.getElementById('burp-mode');
+            const burpContainer = document.getElementById('burp-container');
+            const requestMethod = document.getElementById('request-method');
+            const requestPath = document.getElementById('request-path');
+            const headerName = document.getElementById('header-name');
+            const headerValue = document.getElementById('header-value');
+            const addHeader = document.getElementById('add-header');
+            const headerList = document.getElementById('header-list');
+            const requestBody = document.getElementById('request-body');
+            const analyzeRequest = document.getElementById('analyze-request');
+            const clearRequest = document.getElementById('clear-request');
+            const generateExploit = document.getElementById('generate-exploit');
+            const frontendView = document.getElementById('frontend-view');
+            const backendView = document.getElementById('backend-view');
+            const frontendBytes = document.getElementById('frontend-bytes');
+            const backendBytes = document.getElementById('backend-bytes');
+            const vulnerabilityAnalysis = document.getElementById('vulnerability-analysis');
+            const burpLog = document.getElementById('burp-log');
+            
+            // Current state
+            let currentStep = 0;
+            let currentAttackType = 'cl-te';
+            let simulationActive = false;
+            let currentMode = 'basic';
+            
+            // Initialize
+            updateAttackDescription();
+            updateRequestTemplates();
+            
+            // Event Handlers - Mode Switching
+            modeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const mode = this.getAttribute('data-mode');
+                    switchMode(mode);
+                });
+            });
+            
+            // Event Handlers - Basic Mode
+            attackTypeSelect.addEventListener('change', function() {
+                currentAttackType = this.value;
+                updateAttackDescription();
+                updateRequestTemplates();
+                resetSimulation();
+                updateVisualization();
+            });
+            
+            // Tab navigation
+            tabNormal.addEventListener('click', function() {
+                activateTab('tab-normal');
+            });
+            
+            tabExploit.addEventListener('click', function() {
+                activateTab('tab-exploit');
+            });
+            
+            tabCustom.addEventListener('click', function() {
+                activateTab('tab-custom');
+            });
+            
+            btnValidate.addEventListener('click', function() {
+                validateCustomRequest();
+            });
+            
+            btnSend.addEventListener('click', function() {
+                if (simulationActive) return;
+                
+                addLog('=== Starting simulation ===');
+                simulationActive = true;
+                currentStep = 0;
+                btnSend.disabled = true;
+                btnStep.disabled = false;
+                updateExplanation(0);
+                progressBar.style.width = '0%';
+                
+                // Update visualization based on current attack type
+                updateVisualization();
+            });
+            
+            btnReset.addEventListener('click', function() {
+                resetSimulation();
+            });
+            
+            btnStep.addEventListener('click', function() {
+                if (!simulationActive) return;
+                
+                const steps = attackSteps[currentAttackType];
+                if (currentStep < steps.length) {
+                    addLog(steps[currentStep].log);
+                    updateExplanation(currentStep);
+                    
+                    // Create packet animation
+                    if (currentStep === 1) {
+                        createPacket('client-to-frontend');
+                    } else if (currentStep === 3) {
+                        createPacket('frontend-to-backend');
+                    }
+                    
+                    const progress = ((currentStep + 1) / steps.length) * 100;
+                    progressBar.style.width = progress + '%';
+                    
+                    currentStep++;
+                    
+                    if (currentStep >= steps.length) {
+                        btnStep.disabled = true;
+                        setTimeout(() => {
+                            addLog('=== Simulation complete ===');
+                            btnSend.disabled = false;
+                            simulationActive = false;
+                        }, 1000);
+                    }
+                }
+            });
+            
+            // Event Handlers - Pro Mode
+            burpMode.addEventListener('change', function() {
+                burpContainer.classList.toggle('hidden', !this.checked);
+                if (this.checked) {
+                    addBurpLog('[+] Burp Suite mode activated');
+                    addBurpLog('[+] HTTP history will now be recorded and analyzed');
+                }
+            });
+            
+            addHeader.addEventListener('click', function() {
+                const name = headerName.value.trim();
+                const value = headerValue.value.trim();
+                
+                if (name && value) {
+                    addHeaderToList(name, value);
+                    headerName.value = '';
+                    headerValue.value = '';
+                    headerName.focus();
+                }
+            });
+            
+            // Remove header event delegation
+            headerList.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-header')) {
+                    const headerName = e.target.getAttribute('data-header');
+                    e.target.parentNode.remove();
+                }
+            });
+            
+            analyzeRequest.addEventListener('click', function() {
+                const request = buildRequestFromInputs();
+                analyzeHttpRequest(request);
+            });
+            
+            clearRequest.addEventListener('click', function() {
+                clearRequestBuilder();
+            });
+            
+            generateExploit.addEventListener('click', function() {
+                generateExploitRequest();
+            });
+            
+            // Helper Functions
+            function switchMode(mode) {
+                currentMode = mode;
+                
+                // Update UI
+                modeButtons.forEach(btn => {
+                    btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
+                });
+                
+                // Show/hide corresponding mode containers
+                basicMode.classList.toggle('hidden', mode !== 'basic');
+                proMode.classList.toggle('hidden', mode !== 'pro');
+                
+                // Reset state if switching to basic mode
+                if (mode === 'basic') {
+                    resetSimulation();
+                }
+            }
+            
+            function activateTab(tabId) {
+                // Update tab buttons
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.getAttribute('data-tab') === tabId);
+                });
+                
+                // Show/hide tab content
+                tabContentNormal.classList.toggle('active', tabId === 'tab-normal');
+                tabContentExploit.classList.toggle('active', tabId === 'tab-exploit');
+                tabContentCustom.classList.toggle('active', tabId === 'tab-custom');
+            }
+            
+            function updateAttackDescription() {
+                attackDescription.textContent = attackDescriptions[currentAttackType];
+            }
+            
+            function updateRequestTemplates() {
+                normalRequest.value = requestTemplates[currentAttackType].normal;
+                exploitRequest.value = requestTemplates[currentAttackType].exploit;
+                customRequest.value = requestTemplates[currentAttackType].exploit;
+            }
+            
+            function addLog(message) {
+                const logLine = document.createElement('p');
+                logLine.className = 'log-line';
+                logLine.textContent = message;
+                logContainer.appendChild(logLine);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+            
+            function addBurpLog(message) {
+                const logLine = document.createElement('p');
+                logLine.className = 'log-line';
+                logLine.textContent = message;
+                burpLog.appendChild(logLine);
+                burpLog.scrollTop = burpLog.scrollHeight;
+            }
+            
+            function updateExplanation(step) {
+                const steps = attackSteps[currentAttackType];
+                if (step < steps.length) {
+                    explanationContainer.innerHTML = `<p>${steps[step].explanation}</p>`;
+                }
+            }
+            
+            function resetSimulation() {
+                simulationActive = false;
+                currentStep = 0;
+                btnSend.disabled = false;
+                btnStep.disabled = false;
+                progressBar.style.width = '0%';
+                
+                // Clear logs
+                logContainer.innerHTML = '<p class="log-line">System ready to process requests...</p>';
+                
+                // Clear animations
+                packetContainer.innerHTML = '';
+                
+                // Reset explanation
+                explanationContainer.innerHTML = `
+                    <p>HTTP Request Smuggling is an attack technique that exploits inconsistencies in how multi-request HTTP messages are interpreted between proxy servers and application servers.</p>
+                    <p>In the <span class="highlight">${currentAttackType.toUpperCase()}</span> scenario:</p>
+                    <ul>
+                        <li>Different servers interpret HTTP headers differently</li>
+                        <li>This inconsistency allows part of a request to be "smuggled" through the frontend to the backend</li>
+                    </ul>
+                    <p>Click "Next Step" for a step-by-step visualization of the attack.</p>
+                `;
+                
+                // Reset visualization
+                updateVisualization();
+            }
+            
+            function createPacket(direction) {
+                const packet = document.createElement('div');
+                packet.className = 'packet';
+                packet.textContent = 'HTTP';
+                
+                if (direction === 'client-to-frontend') {
+                    packet.style.top = '40px';
+                    packet.style.left = '10px';
+                    packet.style.animationName = 'moveRequestToFrontend';
+                } else if (direction === 'frontend-to-backend') {
+                    packet.style.top = '40px';
+                    packet.style.left = '290px';
+                    packet.style.animationName = 'moveRequestToBackend';
+                }
+                
+                packetContainer.appendChild(packet);
+                
+                // Remove packet after animation
+                setTimeout(() => {
+                    packet.style.animationName = 'fadeOut';
+                    setTimeout(() => {
+                        packet.remove();
+                    }, 1000);
+                }, 3000);
+            }
+            
+            function updateVisualization() {
+                // Update raw request display
+                const requestToVisualize = exploitRequest.value;
+                rawRequest.textContent = requestToVisualize;
+                
+                // Update frontend/backend interpretation based on attack type
+                let frontendHighlightPercent = 100;
+                let backendHighlightPercent = 100;
+                
+                if (currentAttackType === 'cl-te') {
+                    // CL.TE: Frontend sees everything up to Content-Length, backend sees less due to chunked encoding
+                    frontendHighlightPercent = 100; // Frontend sees the entire request
+                    backendHighlightPercent = 75;  // Backend sees up to the "0\n\n" part
+                } else if (currentAttackType === 'te-cl') {
+                    // TE.CL: Frontend sees the chunked request, backend only sees up to Content-Length
+                    frontendHighlightPercent = 100; // Frontend processes the entire chunked request
+                    backendHighlightPercent = 60;  // Backend only processes the first part
+                } else if (currentAttackType === 'te-te') {
+                    // TE.TE: Both process differently based on which TE header they prioritize
+                    frontendHighlightPercent = 90; // Frontend prioritizes chunked
+                    backendHighlightPercent = 100; // Backend treats it all as identity
+                }
+                
+                // Apply the visualizations
+                frontendInterpretation.querySelector('.highlight-overlay').style.width = `${frontendHighlightPercent}%`;
+                backendInterpretation.querySelector('.highlight-overlay').style.width = `${backendHighlightPercent}%`;
+                
+                // Set the content
+                frontendInterpretation.innerHTML = `<div class="highlight-overlay" style="width: ${frontendHighlightPercent}%;"></div>${requestToVisualize}`;
+                backendInterpretation.innerHTML = `<div class="highlight-overlay" style="width: ${backendHighlightPercent}%;"></div>${requestToVisualize}`;
+            }
+            
+            function validateCustomRequest() {
+                const requestContent = customRequest.value.trim();
+                
+                if (!requestContent) {
+                    addLog('Error: Request is empty');
+                    return;
+                }
+                
+                // Basic validation
+                if (!requestContent.includes('HTTP/1.1')) {
+                    addLog('Warning: Missing HTTP/1.1 protocol version');
+                }
+                
+                if (!requestContent.includes('Host:')) {
+                    addLog('Warning: Missing Host header');
+                }
+                
+                // Check for potential HTTP smuggling vulnerabilities
+                const hasContentLength = requestContent.includes('Content-Length:');
+                const hasTransferEncoding = requestContent.includes('Transfer-Encoding:');
+                
+                if (hasContentLength && hasTransferEncoding) {
+                    addLog('Potential vulnerability: Request contains both Content-Length and Transfer-Encoding headers');
+                    
+                    // Check for specific patterns
+                    if (requestContent.includes('Transfer-Encoding: chunked') && requestContent.includes('Content-Length:')) {
+                        addLog('Potential CL.TE or TE.CL vulnerability detected');
+                    }
+                    
+                    if (requestContent.includes('Transfer-Encoding: chunked') && 
+                        (requestContent.match(/Transfer-Encoding:/g) || []).length > 1) {
+                        addLog('Potential TE.TE vulnerability detected (multiple Transfer-Encoding headers)');
+                    }
+                }
+                
+                // Check for obfuscation techniques
+                if (requestContent.includes('Transfer-Encoding') && !requestContent.includes('Transfer-Encoding: chunked')) {
+                    addLog('Note: Non-standard Transfer-Encoding value detected');
+                }
+                
+                // Check for nested chunks
+                if (requestContent.includes('0\r\n\r\n') || requestContent.includes('0\n\n')) {
+                    addLog('Note: Chunked encoding terminator detected (0 followed by empty line)');
+                }
+                
+                addLog('✓ Request validation complete');
+            }
+            
+            // Pro Mode Functions
+            function addHeaderToList(name, value) {
+                const headerItem = document.createElement('div');
+                headerItem.className = 'header-item';
+                headerItem.innerHTML = `
+                    <span>${name}: ${value}</span>
+                    <button class="remove-header" data-header="${name}">×</button>
+                `;
+                headerList.appendChild(headerItem);
+            }
+            
+            function buildRequestFromInputs() {
+                const method = requestMethod.value;
+                const path = requestPath.value || '/';
+                const headers = [];
+                
+                // Get all headers from the list
+                const headerItems = headerList.querySelectorAll('.header-item');
+                headerItems.forEach(item => {
+                    const headerText = item.querySelector('span').textContent;
+                    headers.push(headerText);
+                });
+                
+                const body = requestBody.value;
+                
+                // Build request string
+                let requestString = `${method} ${path} HTTP/1.1\n`;
+                headers.forEach(header => {
+                    requestString += `${header}\n`;
+                });
+                
+                requestString += '\n';
+                
+                if (body) {
+                    requestString += body;
+                }
+                
+                return requestString;
+            }
+            
+            function clearRequestBuilder() {
+                requestMethod.value = 'POST';
+                requestPath.value = '/';
+                headerList.innerHTML = '<div class="header-item"><span>Host: example.com</span><button class="remove-header" data-header="Host">×</button></div>';
+                requestBody.value = '';
+                frontendView.textContent = 'Waiting for request analysis...';
+                backendView.textContent = 'Waiting for request analysis...';
+                frontendBytes.innerHTML = '';
+                backendBytes.innerHTML = '';
+                vulnerabilityAnalysis.textContent = 'Run the analysis to detect potential HTTP Request Smuggling vulnerabilities.';
+            }
+            
+            function analyzeHttpRequest(requestString) {
+                // Split the request into lines
+                const lines = requestString.split('\n');
+                const requestLine = lines[0];
+                const headers = {};
+                let bodyStartIndex = 0;
+                
+                // Parse headers
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (line === '') {
+                        bodyStartIndex = i + 1;
+                        break;
+                    }
+                    
+                    const [name, value] = line.split(':').map(part => part.trim());
+                    headers[name.toLowerCase()] = value;
+                }
+                
+                // Extract body
+                const body = lines.slice(bodyStartIndex).join('\n');
+                
+                // Determine how frontend and backend will interpret this request
+                let frontendBoundary = requestString.length;
+                let backendBoundary = requestString.length;
+                let vulnerability = null;
+                
+                // Frontend server behavior
+                const frontendServerType = frontendType.value;
+                if (headers['content-length'] && headers['transfer-encoding']) {
+                    if (frontendServerType === 'nginx') {
+                        // Nginx prioritizes Transfer-Encoding over Content-Length
+                        if (headers['transfer-encoding'].includes('chunked')) {
+                            // Process as chunked
+                            const chunks = parseChunkedBody(body);
+                            frontendBoundary = calculateChunkedEndPosition(requestString, bodyStartIndex, chunks);
+                        } else {
+                            // Process as Content-Length
+                            const contentLength = parseInt(headers['content-length']);
+                            frontendBoundary = calculateContentLengthEndPosition(requestString, bodyStartIndex, contentLength);
+                        }
+                    } else if (frontendServerType === 'haproxy') {
+                        // HAProxy prioritizes Content-Length if Transfer-Encoding is not chunked
+                        if (headers['transfer-encoding'].includes('chunked')) {
+                            // Process as chunked
+                            const chunks = parseChunkedBody(body);
+                            frontendBoundary = calculateChunkedEndPosition(requestString, bodyStartIndex, chunks);
+                        } else {
+                            // Process as Content-Length
+                            const contentLength = parseInt(headers['content-length']);
+                            frontendBoundary = calculateContentLengthEndPosition(requestString, bodyStartIndex, contentLength);
+                        }
+                    } else if (frontendServerType === 'apache') {
+                        // Apache prioritizes Transfer-Encoding over Content-Length
+                        if (headers['transfer-encoding'].includes('chunked')) {
+                            // Process as chunked
+                            const chunks = parseChunkedBody(body);
+                            frontendBoundary = calculateChunkedEndPosition(requestString, bodyStartIndex, chunks);
+                        } else {
+                            // Process as Content-Length
+                            const contentLength = parseInt(headers['content-length']);
+                            frontendBoundary = calculateContentLengthEndPosition(requestString, bodyStartIndex, contentLength);
+                        }
+                    }
+                } else if (headers['content-length']) {
+                    // Process as Content-Length
+                    const contentLength = parseInt(headers['content-length']);
+                    frontendBoundary = calculateContentLengthEndPosition(requestString, bodyStartIndex, contentLength);
+                } else if (headers['transfer-encoding'] && headers['transfer-encoding'].includes('chunked')) {
+                    // Process as chunked
+                    const chunks = parseChunkedBody(body);
+                    frontendBoundary = calculateChunkedEndPosition(requestString, bodyStartIndex, chunks);
+                }
+                
+                // Backend server behavior
+                const backendServerType = backendType.value;
+                if (headers['content-length'] && headers['transfer-encoding']) {
+                    if (backendServerType === 'tomcat') {
+                        // Tomcat prioritizes Transfer-Encoding over Content-Length
+                        if (headers['transfer-encoding'].includes('chunked')) {
+                            // Process as chunked
+                            const chunks = parseChunkedBody(body);
+                            backendBoundary = calculateChunkedEndPosition(requestString, bodyStartIndex, chunks);
+                        } else {
+                            // Process as Content-Length
+                            const contentLength = parseInt(headers['content-length']);
+                            backendBoundary = calculateContentLengthEndPosition(requestString, bodyStartIndex, contentLength);
+                        }
+                    } else if (backendServerType === 'iis') {
+                        // IIS has complex behavior depending on Transfer-Encoding format
+                        if (headers['transfer-encoding'].includes('chunked')) {
+                            // For simplicity in this demo, assume Content-Length is used
+                            const contentLength = parseInt(headers['content-length']);
+                            backendBoundary = calculateContentLengthEndPosition(requestString, bodyStartIndex, contentLength);
+                        } else {
+                            // Process as Content-Length
+                            const contentLength = parseInt(headers['content-length']);
+                            backendBoundary = calculateContentLengthEndPosition(requestString, bodyStartIndex, contentLength);
+                        }
+                    } else if (backendServerType === 'nodejs') {
+                        // Node.js prioritizes Transfer-Encoding over Content-Length
+                        if (headers['transfer-encoding'].includes('chunked')) {
+                            // Process as chunked
+                            const chunks = parseChunkedBody(body);
+                            backendBoundary = calculateChunkedEndPosition(requestString, bodyStartIndex, chunks);
+                        } else {
+                            // Process as Content-Length
+                            const contentLength = parseInt(headers['content-length']);
+                            backendBoundary = calculateContentLengthEndPosition(requestString, bodyStartIndex, contentLength);
+                        }
+                    }
+                } else if (headers['content-length']) {
+                    // Process as Content-Length
+                    const contentLength = parseInt(headers['content-length']);
+                    backendBoundary = calculateContentLengthEndPosition(requestString, bodyStartIndex, contentLength);
+                } else if (headers['transfer-encoding'] && headers['transfer-encoding'].includes('chunked')) {
+                    // Process as chunked
+                    const chunks = parseChunkedBody(body);
+                    backendBoundary = calculateChunkedEndPosition(requestString, bodyStartIndex, chunks);
+                }
+                
+                // Detect vulnerability type
+                if (frontendBoundary !== backendBoundary) {
+                    if (headers['content-length'] && headers['transfer-encoding']) {
+                        if (frontendBoundary > backendBoundary) {
+                            vulnerability = 'TE.CL';
+                        } else {
+                            vulnerability = 'CL.TE';
+                        }
+                    } else if ((headers['transfer-encoding'] || '').split(',').length > 1) {
+                        vulnerability = 'TE.TE';
+                    }
+                }
+                
+                // Update visualizations
+                displayRequestInterpretation(requestString, frontendBoundary, backendBoundary, vulnerability);
+            }
+            
+            function parseChunkedBody(body) {
+                const chunks = [];
+                const lines = body.split('\n');
+                let i = 0;
+                
+                while (i < lines.length) {
+                    const chunkSizeHex = lines[i].trim();
+                    if (!chunkSizeHex) {
+                        i++;
+                        continue;
+                    }
+                    
+                    const chunkSize = parseInt(chunkSizeHex, 16);
+                    
+                    if (chunkSize === 0) {
+                        // End of chunks
+                        chunks.push({
+                            size: 0,
+                            content: '',
+                            sizeLineIndex: i
+                        });
+                        break;
+                    }
+                    
+                    i++;
+                    
+                    // Collect the chunk content
+                    let chunkContent = '';
+                    let contentLines = 0;
+                    while (contentLines < chunkSize && i < lines.length) {
+                        chunkContent += lines[i] + '\n';
+                        contentLines += lines[i].length + 1; // +1 for newline
+                        i++;
+                    }
+                    
+                    chunks.push({
+                        size: chunkSize,
+                        content: chunkContent,
+                        sizeLineIndex: i - contentLines
+                    });
+                }
+                
+                return chunks;
+            }
+            
+            function calculateContentLengthEndPosition(requestString, bodyStartIndex, contentLength) {
+                const bodyStartPos = requestString.split('\n').slice(0, bodyStartIndex).join('\n').length;
+                return bodyStartPos + contentLength + 1; // +1 for the newline after headers
+            }
+            
+            function calculateChunkedEndPosition(requestString, bodyStartIndex, chunks) {
+                if (chunks.length === 0) {
+                    return requestString.length;
+                }
+                
+                // Find the position of the last 0-size chunk
+                const lastChunk = chunks[chunks.length - 1];
+                if (lastChunk.size === 0) {
+                    const lines = requestString.split('\n');
+                    const chunkLinePos = bodyStartIndex + lastChunk.sizeLineIndex;
+                    
+                    // Calculate position in the string
+                    let pos = 0;
+                    for (let i = 0; i <= chunkLinePos; i++) {
+                        pos += lines[i].length + 1; // +1 for newline
+                    }
+                    
+                    // Add 2 for the trailing CRLF after the 0-chunk
+                    return pos + 2;
+                }
+                
+                return requestString.length;
+            }
+            
+            function displayRequestInterpretation(requestString, frontendBoundary, backendBoundary, vulnerability) {
+                // Display for frontend view
+                const frontendString = requestString.substring(0, frontendBoundary);
+                frontendView.textContent = frontendString;
+                
+                // Display for backend view
+                const backendString = requestString.substring(0, backendBoundary);
+                backendView.textContent = backendString;
+                
+                // Generate byte-by-byte visualization
+                generateByteVisualization(requestString, frontendBoundary, backendBoundary);
+                
+                // Update vulnerability analysis
+                updateVulnerabilityAnalysis(vulnerability, frontendBoundary, backendBoundary, requestString);
+                
+                // If Burp mode is on, add to Burp log
+                if (burpMode.checked) {
+                    let logMessage = `[${new Date().toLocaleTimeString()}] Analyzed request: ${requestString.split('\n')[0]}`;
+                    
+                    if (vulnerability) {
+                        logMessage += ` - VULNERABLE: ${vulnerability}`;
+                    }
+                    
+                    addBurpLog(logMessage);
+                    
+                    if (vulnerability) {
+                        addBurpLog(`[!] HTTP Request Smuggling vulnerability detected: ${vulnerability}`);
+                        addBurpLog(`[!] Frontend boundary: ${frontendBoundary}, Backend boundary: ${backendBoundary}`);
+                        addBurpLog(`[!] Smuggled content: "${requestString.substring(Math.min(frontendBoundary, backendBoundary)).replace(/\n/g, '\\n')}"`);
+                    }
+                }
+            }
+            
+            function generateByteVisualization(requestString, frontendBoundary, backendBoundary) {
+                frontendBytes.innerHTML = '';
+                backendBytes.innerHTML = '';
+                
+                // Convert string to array of characters for visualization
+                const chars = requestString.split('');
+                
+                // Generate frontend bytes visualization
+                for (let i = 0; i < chars.length; i++) {
+                    const byteElem = document.createElement('div');
+                    byteElem.className = 'byte';
+                    
+                    if (i === frontendBoundary - 1) {
+                        byteElem.classList.add('frontend-boundary');
+                    }
+                    
+                    // Handle special characters
+                    let displayChar = chars[i];
+                    let tooltipText = '';
+                    
+                    if (displayChar === '\n') {
+                        displayChar = '\\n';
+                        tooltipText = 'Newline (LF)';
+                    } else if (displayChar === '\r') {
+                        displayChar = '\\r';
+                        tooltipText = 'Carriage Return (CR)';
+                    } else if (displayChar === ' ') {
+                        displayChar = '␣';
+                        tooltipText = 'Space';
+                    } else if (displayChar === '\t') {
+                        displayChar = '\\t';
+                        tooltipText = 'Tab';
+                    }
+                    
+                    byteElem.textContent = displayChar;
+                    
+                    if (tooltipText) {
+                        const tooltip = document.createElement('div');
+                        tooltip.className = 'byte-tooltip';
+                        tooltip.textContent = tooltipText;
+                        byteElem.appendChild(tooltip);
+                    }
+                    
+                    // Only show up to 100 bytes for performance
+                    if (i < 100) {
+                        frontendBytes.appendChild(byteElem);
+                    } else if (i === 100) {
+                        const ellipsis = document.createElement('div');
+                        ellipsis.className = 'byte';
+                        ellipsis.textContent = '...';
+                        frontendBytes.appendChild(ellipsis);
+                        break;
+                    }
+                }
+                
+                // Generate backend bytes visualization
+                for (let i = 0; i < chars.length; i++) {
+                    const byteElem = document.createElement('div');
+                    byteElem.className = 'byte';
+                    
+                    if (i === backendBoundary - 1) {
+                        byteElem.classList.add('backend-boundary');
+                    }
+                    
+                    // Handle special characters
+                    let displayChar = chars[i];
+                    let tooltipText = '';
+                    
+                    if (displayChar === '\n') {
+                        displayChar = '\\n';
+                        tooltipText = 'Newline (LF)';
+                    } else if (displayChar === '\r') {
+                        displayChar = '\\r';
+                        tooltipText = 'Carriage Return (CR)';
+                    } else if (displayChar === ' ') {
+                        displayChar = '␣';
+                        tooltipText = 'Space';
+                    } else if (displayChar === '\t') {
+                        displayChar = '\\t';
+                        tooltipText = 'Tab';
+                    }
+                    
+                    byteElem.textContent = displayChar;
+                    
+                    if (tooltipText) {
+                        const tooltip = document.createElement('div');
+                        tooltip.className = 'byte-tooltip';
+                        tooltip.textContent = tooltipText;
+                        byteElem.appendChild(tooltip);
+                    }
+                    
+                    // Only show up to 100 bytes for performance
+                    if (i < 100) {
+                        backendBytes.appendChild(byteElem);
+                    } else if (i === 100) {
+                        const ellipsis = document.createElement('div');
+                        ellipsis.className = 'byte';
+                        ellipsis.textContent = '...';
+                        backendBytes.appendChild(ellipsis);
+                        break;
+                    }
+                }
+            }
+            
+            function updateVulnerabilityAnalysis(vulnerability, frontendBoundary, backendBoundary, requestString) {
+                let analysisHtml = '';
+                
+                if (vulnerability) {
+                    analysisHtml += `<p class="highlight">HTTP Request Smuggling vulnerability detected: ${vulnerability}</p>`;
+                    
+                    if (vulnerability === 'CL.TE') {
+                        analysisHtml += `<p>The frontend server processes the request using Content-Length, but the backend uses Transfer-Encoding: chunked. The frontend sees ${frontendBoundary} bytes while the backend sees ${backendBoundary} bytes.</p>`;
+                        analysisHtml += `<p>This allows an attacker to smuggle ${Math.abs(frontendBoundary - backendBoundary)} bytes of the request.</p>`;
+                    } else if (vulnerability === 'TE.CL') {
+                        analysisHtml += `<p>The frontend server processes the request using Transfer-Encoding: chunked, but the backend uses Content-Length. The frontend sees ${frontendBoundary} bytes while the backend sees ${backendBoundary} bytes.</p>`;
+                        analysisHtml += `<p>This allows an attacker to smuggle ${Math.abs(frontendBoundary - backendBoundary)} bytes of the request.</p>`;
+                    } else if (vulnerability === 'TE.TE') {
+                        analysisHtml += `<p>Both servers process the Transfer-Encoding header differently. The frontend sees ${frontendBoundary} bytes while the backend sees ${backendBoundary} bytes.</p>`;
+                        analysisHtml += `<p>This allows an attacker to smuggle ${Math.abs(frontendBoundary - backendBoundary)} bytes of the request.</p>`;
+                    }
+                    
+                    // Add smuggled content
+                    const smuggledContent = requestString.substring(Math.min(frontendBoundary, backendBoundary)).replace(/\n/g, '\\n');
+                    analysisHtml += `<p>Smuggled content: <span class="highlight">"${smuggledContent}"</span></p>`;
+                    
+                    // Add exploitation suggestions
+                    analysisHtml += `<h4>Exploitation Potential:</h4>`;
+                    analysisHtml += `<ul>`;
+                    analysisHtml += `<li>Request/response queue poisoning</li>`;
+                    analysisHtml += `<li>Web cache poisoning</li>`;
+                    analysisHtml += `<li>HTTP response splitting</li>`;
+                    analysisHtml += `<li>Cookie manipulation</li>`;
+                    analysisHtml += `</ul>`;
+                } else {
+                    analysisHtml += `<p>No HTTP Request Smuggling vulnerability detected in this request.</p>`;
+                    
+                    if (requestString.includes('Content-Length') && requestString.includes('Transfer-Encoding')) {
+                        analysisHtml += `<p>Although the request contains both Content-Length and Transfer-Encoding headers, the selected server configurations process them consistently.</p>`;
+                    } else {
+                        analysisHtml += `<p>The request does not contain the necessary headers to trigger a smuggling vulnerability. Try adding both Content-Length and Transfer-Encoding headers.</p>`;
+                    }
+                }
+                
+                vulnerabilityAnalysis.innerHTML = analysisHtml;
+            }
+            
+            function generateExploitRequest() {
+                const frontendServer = frontendType.value;
+                const backendServer = backendType.value;
+                
+                let exploitTemplate = '';
+                let exploitType = '';
+                
+                // Determine the best exploit based on server configurations
+                if ((frontendServer === 'nginx' && backendServer === 'iis') || 
+                    (frontendServer === 'apache' && backendServer === 'iis')) {
+                    // CL.TE vulnerability
+                    exploitType = 'CL.TE';
+                    exploitTemplate = `POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G`;
+                } else if ((frontendServer === 'haproxy' && backendServer === 'tomcat') ||
+                           (frontendServer === 'haproxy' && backendServer === 'nodejs')) {
+                    // TE.CL vulnerability
+                    exploitType = 'TE.CL';
+                    exploitTemplate = `POST / HTTP/1.1
+Host: example.com
+Content-Length: 4
+Transfer-Encoding: chunked
+
+12
+SMUGGLED REQUEST
+0
+
+`;
+                } else if ((frontendServer === 'nginx' && backendServer === 'tomcat') ||
+                          (frontendServer === 'apache' && backendServer === 'tomcat')) {
+                    // TE.TE vulnerability
+                    exploitType = 'TE.TE';
+                    exploitTemplate = `POST / HTTP/1.1
+Host: example.com
+Transfer-Encoding: chunked
+Transfer-Encoding: identity
+
+5
+AAAAA
+0
+
+`;
+                } else {
+                    // Default to CL.TE
+                    exploitType = 'CL.TE (Generic)';
+                    exploitTemplate = `POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G`;
+                }
+                
+                // Clear current request builder
+                clearRequestBuilder();
+                
+                // Set the request body
+                requestBody.value = exploitTemplate.split('\n\n')[1];
+                
+                // Parse and add headers
+                const headers = exploitTemplate.split('\n\n')[0].split('\n').slice(1);
+                headerList.innerHTML = ''; // Clear existing headers
+                
+                headers.forEach(header => {
+                    const [name, value] = header.split(':').map(part => part.trim());
+                    addHeaderToList(name, value);
+                });
+                
+                // Set the request method and path
+                const requestLine = exploitTemplate.split('\n')[0];
+                const [method, path] = requestLine.split(' ');
+                requestMethod.value = method;
+                requestPath.value = path;
+                
+                // Add to Burp log if enabled
+                if (burpMode.checked) {
+                    addBurpLog(`[+] Generated ${exploitType} exploit for ${frontendServer} frontend and ${backendServer} backend`);
+                }
+                
+                // Analyze the request
+                analyzeHttpRequest(exploitTemplate);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+192.168.97.7 - - [14/May/2025:11:21:09 +0000] "POST / HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=5 te=chunked
+192.168.97.7 - - [14/May/2025:11:21:09 +0000] "POST / HTTP/1.1" 400 157 "-" "-" rt=0.000 uct="-" uht="-" urt="-" cl=50 te=chunked
+192.168.97.7 - - [14/May/2025:11:21:11 +0000] "POST / HTTP/1.1" 400 157 "-" "-" rt=2.003 uct="-" uht="-" urt="-" cl=4 te=chunked
+192.168.97.1 - - [14/May/2025:11:21:29 +0000] "GET / HTTP/1.1" 200 43 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.065 uct="0.001" uht="0.066" urt="0.066" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:21:30 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "http://localhost:8080/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.004 uct="0.001" uht="0.004" urt="0.004" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:34:11 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.120 uct="0.001" uht="0.120" urt="0.120" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:34:12 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.004 uct="0.000" uht="0.005" urt="0.005" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:34:31 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.018 uct="0.003" uht="0.018" urt="0.018" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:34:32 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.020 uct="0.000" uht="0.019" urt="0.019" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:34:46 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.013 uct="0.002" uht="0.014" urt="0.014" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:34:53 +0000] "GET / HTTP/1.1" 200 43 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.009 uct="0.001" uht="0.010" urt="0.010" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:34:53 +0000] "GET /favicon.ico HTTP/1.1" 499 0 "http://localhost:8080/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.001 uct="0.001" uht="-" urt="0.001" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:34:56 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.009 uct="0.001" uht="0.010" urt="0.010" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:35:02 +0000] "GET /?r=1 HTTP/1.1" 200 43 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.014 uct="0.001" uht="0.014" urt="0.014" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:35:26 +0000] "CONNECT flplayer.net:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:35:26 +0000] "CONNECT profile.accounts.firefox.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:35:26 +0000] "CONNECT sync-1-us-west1-g.sync.services.mozilla.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.000 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:35:27 +0000] "GET /?r=1 HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.027 uct="0.004" uht="0.026" urt="0.026" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:35:27 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.000 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:35:27 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:35:28 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:35:28 +0000] "CONNECT ik.imagekit.io:443 HTTP/1.1" 400 157 "-" "-" rt=0.000 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:35:33 +0000] "CONNECT www.mozilla.org:443 HTTP/1.1" 400 157 "-" "-" rt=0.000 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:39:08 +0000] "GET / HTTP/1.1" 200 43 "-" "-" rt=0.122 uct="0.002" uht="0.122" urt="0.122" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:39:19 +0000] "POST / HTTP/1.1" 404 140 "-" "-" rt=0.003 uct="0.001" uht="0.004" urt="0.004" cl=- te=-
+192.168.97.1 - - [14/May/2025:11:40:57 +0000] "POST / HTTP/1.1" 404 140 "-" "-" rt=0.020 uct="0.002" uht="0.020" urt="0.020" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:05:30 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.114 uct="0.002" uht="0.114" urt="0.114" cl=- te=-
+192.168.97.9 - - [14/May/2025:13:10:13 +0000] "POST / HTTP/1.1" 400 157 "-" "-" rt=0.000 uct="-" uht="-" urt="-" cl=5 te=chunked
+192.168.97.9 - - [14/May/2025:13:10:13 +0000] "POST / HTTP/1.1" 400 157 "-" "-" rt=0.000 uct="-" uht="-" urt="-" cl=50 te=chunked
+192.168.97.9 - - [14/May/2025:13:10:15 +0000] "POST / HTTP/1.1" 400 157 "-" "-" rt=2.001 uct="-" uht="-" urt="-" cl=4 te=chunked
+192.168.97.8 - - [14/May/2025:13:16:44 +0000] "POST / HTTP/1.1" 400 157 "-" "-" rt=0.000 uct="-" uht="-" urt="-" cl=5 te=chunked
+192.168.97.8 - - [14/May/2025:13:16:44 +0000] "POST / HTTP/1.1" 400 157 "-" "-" rt=0.000 uct="-" uht="-" urt="-" cl=50 te=chunked
+192.168.97.8 - - [14/May/2025:13:16:46 +0000] "POST / HTTP/1.1" 400 157 "-" "-" rt=2.003 uct="-" uht="-" urt="-" cl=4 te=chunked
+192.168.97.1 - - [14/May/2025:13:23:12 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.003 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:12 +0000] "CONNECT www.youtube.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:14 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.003 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:14 +0000] "POST / HTTP/1.1" 404 140 "-" "-" rt=0.067 uct="0.002" uht="0.067" urt="0.067" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:24 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:30 +0000] "CONNECT www.youtube.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:34 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:36 +0000] "CONNECT accounts.youtube.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.003 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:45 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:51 +0000] "CONNECT firefox.settings.services.mozilla.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:51 +0000] "CONNECT cdn.jsdelivr.net:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:51 +0000] "CONNECT incoming.telemetry.mozilla.org:443 HTTP/1.1" 400 157 "-" "-" rt=0.000 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:51 +0000] "CONNECT incoming.telemetry.mozilla.org:443 HTTP/1.1" 400 157 "-" "-" rt=0.000 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:51 +0000] "CONNECT incoming.telemetry.mozilla.org:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:51 +0000] "CONNECT cdn.jsdelivr.net:443 HTTP/1.1" 400 157 "-" "-" rt=0.000 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:23:56 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:24:06 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:24:12 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:24:16 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:24:26 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:24:36 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.003 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:24:41 +0000] "CONNECT cdn.jsdelivr.net:443 HTTP/1.1" 400 157 "-" "-" rt=0.003 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:24:41 +0000] "CONNECT cdn.jsdelivr.net:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:24:46 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:24:52 +0000] "CONNECT www.youtube.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:24:56 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:06 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:09 +0000] "CONNECT qualysguard.qualys.eu:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:12 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.004 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:16 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:20 +0000] "CONNECT cdn.jsdelivr.net:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:20 +0000] "CONNECT cdn.jsdelivr.net:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:26 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:36 +0000] "CONNECT accounts.google.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:37 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:45 +0000] "CONNECT feeds.elastic.co:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:47 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:47 +0000] "CONNECT profile.accounts.firefox.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:47 +0000] "CONNECT token.services.mozilla.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:47 +0000] "CONNECT sync-1-us-west1-g.sync.services.mozilla.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:25:57 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:26:07 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:26:12 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:26:17 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:26:21 +0000] "GET /?r=1 HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0" rt=0.039 uct="0.003" uht="0.039" urt="0.039" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:26:27 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:26:37 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.000 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:26:42 +0000] "CONNECT ads.mozilla.org:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:26:47 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:26:57 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:01 +0000] "CONNECT alive.github.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:02 +0000] "CONNECT alive.github.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:04 +0000] "CONNECT alive.github.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:08 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:08 +0000] "CONNECT alive.github.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:12 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:12 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:12 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:13 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:13 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:14 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:15 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:17 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:17 +0000] "CONNECT alive.github.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:18 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:19 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:23 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:28 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:29 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:34 +0000] "CONNECT alive.github.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:38 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:38 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:48 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:51 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:57 +0000] "CONNECT token.services.mozilla.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.013 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:57 +0000] "CONNECT profile.accounts.firefox.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.012 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:57 +0000] "CONNECT sync-1-us-west1-g.sync.services.mozilla.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:27:58 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:28:08 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:28:09 +0000] "CONNECT alive.github.com:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:28:11 +0000] "CONNECT n6.huntflow.kz:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:28:18 +0000] "CONNECT timeweb.cloud:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:28:21 +0000] "CONNECT claude.ai:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:28:23 +0000] "CONNECT claude.ai:443 HTTP/1.1" 400 157 "-" "-" rt=0.001 uct="-" uht="-" urt="-" cl=- te=-
+192.168.97.1 - - [14/May/2025:13:28:25 +0000] "CONNECT www.mozilla.org:443 HTTP/1.1" 400 157 "-" "-" rt=0.002 uct="-" uht="-" urt="-" cl=- te=-

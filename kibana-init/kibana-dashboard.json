@@ -1,0 +1,16 @@
+{
+    "attributes": {
+      "title": "HTTP Request Smuggling Analysis Dashboard",
+      "hits": 0,
+      "description": "Dashboard for analyzing HTTP Request Smuggling attacks",
+      "panelsJSON": "[{\"embeddableConfig\":{\"title\":\"Request Count by Server\"},\"gridData\":{\"h\":15,\"i\":\"1\",\"w\":24,\"x\":0,\"y\":0},\"id\":\"request-count-by-server\",\"panelIndex\":\"1\",\"type\":\"visualization\",\"version\":\"7.17.7\"},{\"embeddableConfig\":{\"title\":\"Potential Smuggling Indicators\"},\"gridData\":{\"h\":15,\"i\":\"2\",\"w\":24,\"x\":24,\"y\":0},\"id\":\"smuggling-indicators\",\"panelIndex\":\"2\",\"type\":\"visualization\",\"version\":\"7.17.7\"},{\"embeddableConfig\":{\"title\":\"Request Timeline\"},\"gridData\":{\"h\":15,\"i\":\"3\",\"w\":48,\"x\":0,\"y\":15},\"id\":\"request-timeline\",\"panelIndex\":\"3\",\"type\":\"visualization\",\"version\":\"7.17.7\"},{\"embeddableConfig\":{\"title\":\"Admin Access Attempts\"},\"gridData\":{\"h\":10,\"i\":\"4\",\"w\":24,\"x\":0,\"y\":30},\"id\":\"admin-access\",\"panelIndex\":\"4\",\"type\":\"visualization\",\"version\":\"7.17.7\"},{\"embeddableConfig\":{\"title\":\"Requests with Both CL & TE Headers\"},\"gridData\":{\"h\":10,\"i\":\"5\",\"w\":24,\"x\":24,\"y\":30},\"id\":\"cl-te-headers\",\"panelIndex\":\"5\",\"type\":\"visualization\",\"version\":\"7.17.7\"},{\"embeddableConfig\":{\"title\":\"Log Browser\",\"hidePanelTitles\":false,\"savedSearchId\":\"http-logs\"},\"gridData\":{\"h\":15,\"i\":\"6\",\"w\":48,\"x\":0,\"y\":40},\"id\":\"log-browser\",\"panelIndex\":\"6\",\"type\":\"search\",\"version\":\"7.17.7\"}]",
+      "optionsJSON": "{\"useMargins\":true,\"hidePanelTitles\":false}",
+      "version": 1,
+      "timeRestore": false,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"
+      }
+    },
+    "id": "http-smuggling-dashboard",
+    "type": "dashboard"
+  }

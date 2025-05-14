@@ -1,0 +1,17 @@
+{
+    "name": "http-smuggling-backend",
+    "version": "1.0.0",
+    "description": "Backend server for HTTP Request Smuggling lab",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js"
+    },
+    "dependencies": {
+      "express": "^4.17.1",
+      "body-parser": "^1.19.0",
+      "morgan": "^1.10.0",
+      "winston": "^3.3.3",
+      "raw-body": "^2.4.1"
+    }
+  }
+  

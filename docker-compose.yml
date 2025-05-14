@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  # Front-end proxy server (NGINX)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend/logs:/var/log/nginx
+      - ./shared/certs:/etc/nginx/certs:ro
+    networks:
+      - lab_network
+    depends_on:
+      - backend
+  
+  # Back-end application server (Node.js/Express)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      # Монтируем только директорию для логов, но не перезаписываем установленные модули
+      - ./backend/logs:/app/logs
+    networks:
+      - lab_network
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+
+  # Web interface for the HTTP Request Smuggling Lab
+  lab_interface:
+    build:
+      context: ./lab_interface
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./lab_interface/logs:/app/logs
+    networks:
+      - lab_network
+    environment:
+      - PORT=8081
+      - ELASTIC_HOST=http://elasticsearch:9200
+      - BACKEND_HOST=backend:3000
+      - FRONTEND_HOST=frontend:80
+    depends_on:
+      - elasticsearch
+      - backend
+      - frontend
+  
+  # Logging and analysis server (ELK Stack)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.7
+    volumes:
+      - ./elk/elasticsearch/data:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    networks:
+      - lab_network
+  
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.7
+    volumes:
+      - ./elk/logstash/pipelines:/usr/share/logstash/pipeline
+      - ./frontend/logs:/nginx_logs:ro
+      - ./backend/logs:/app_logs:ro
+      - ./lab_interface/logs:/interface_logs:ro
+    networks:
+      - lab_network
+    depends_on:
+      - elasticsearch
+  
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.7
+    ports:
+      - "5601:5601"
+    networks:
+      - lab_network
+    depends_on:
+      - elasticsearch
+
+  kibana_init:
+    build:
+      context: ./kibana-init
+      dockerfile: Dockerfile
+    networks:
+    - lab_network
+    depends_on:
+    - kibana
+    restart: on-failure
+
+  # Attack client (Python-based tool)
+  attack_client:
+    build:
+      context: ./attack_client
+      dockerfile: Dockerfile
+    volumes:
+      - ./attack_client:/app
+    networks:
+      - lab_network
+    depends_on:
+      - frontend
+      - backend
+
+networks:
+  lab_network:
+    driver: bridge

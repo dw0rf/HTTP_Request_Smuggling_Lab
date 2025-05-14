@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTTP Request Smuggling - Интерактивная Лаборатория</title>
+    <!-- PixellariCyrillic font -->
+    <link href="https://cdn.jsdelivr.net/gh/YuRaNnNzZZ/PixellariCyrillic/PixellariCyrillic.ttf" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/main.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="crt-effect"></div>
+    <div class="container">
+        <div class="header">
+            <h1>HTTP REQUEST SMUGGLING LAB</h1>
+            <p>Интерактивная лаборатория для понимания уязвимостей HTTP Request Smuggling</p>
+        </div>
+        
+        <!-- User identification panel -->
+        <div class="panel" id="user-panel">
+            <h3 class="panel-header">Идентификация пользователя</h3>
+            <div class="panel-content">
+                <div id="user-info" style="display: none;">
+                    <p>Имя пользователя: <span id="username-display" class="highlight"></span></p>
+                    <p>ID сессии: <span id="session-id-display"></span></p>
+                </div>
+                <div id="user-login">
+                    <input type="text" id="username-input" placeholder="Введите ваше имя" class="input-field">
+                    <button id="save-username" class="btn">Сохранить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attack Type Selection -->
+        <div class="panel">
+            <h3 class="panel-header">Выберите тип атаки</h3>
+            <div class="panel-content">
+                <select id="attack-type" class="select-field">
+                    <option value="cl-te">CL.TE (Content-Length + Transfer-Encoding)</option>
+                    <option value="te-cl">TE.CL (Transfer-Encoding + Content-Length)</option>
+                    <option value="te-te">TE.TE (Dual Transfer-Encoding)</option>
+                </select>
+                
+                <div class="attack-description" id="attack-description">
+                    CL.TE атака использует несоответствия между обработкой Content-Length на frontend-сервере и Transfer-Encoding на backend-сервере.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="grid">
+            <!-- Request Editor -->
+            <div class="panel">
+                <h3 class="panel-header">Редактор запроса</h3>
+                <div class="panel-content">
+                    <div class="tabs">
+                        <button class="tab active" data-tab="tab-normal">Обычный запрос</button>
+                        <button class="tab" data-tab="tab-exploit">Эксплойт</button>
+                        <button class="tab" data-tab="tab-custom">Свой запрос</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="tab-normal">
+                        <textarea id="normal-request" rows="8" class="code-area">GET /page HTTP/1.1
+Host: example.com
+User-Agent: Mozilla/5.0
+Accept: text/html
+Connection: close</textarea>
+                    </div>
+                    
+                    <div class="tab-content" id="tab-exploit">
+                        <textarea id="exploit-request" rows="8" class="code-area">POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G</textarea>
+                    </div>
+                    
+                    <div class="tab-content" id="tab-custom">
+                        <textarea id="custom-request" rows="8" class="code-area">POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G</textarea>
+                        <div class="controls">
+                            <button id="btn-validate" class="btn">Проверить запрос</button>
+                        </div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button id="btn-send" class="btn">Отправить запрос</button>
+                        <button id="btn-reset" class="btn">Сбросить</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Event Log -->
+            <div class="panel">
+                <h3 class="panel-header">Журнал событий</h3>
+                <div class="log-container" id="log-container">
+                    <p class="log-line">Система готова к обработке запросов...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Request Processing Simulation -->
+        <div class="panel">
+            <h3 class="panel-header">Симуляция обработки запроса</h3>
+            <div class="visualizer">
+                <div class="server">
+                    <div class="server-title">Клиент</div>
+                    <svg width="80" height="80" viewBox="0 0 24 24">
+                        <rect x="4" y="6" width="16" height="12" fill="none" stroke="#00ff00" stroke-width="1" />
+                        <line x1="4" y1="9" x2="20" y2="9" stroke="#00ff00" stroke-width="1" />
+                        <rect x="8" y="12" width="8" height="4" fill="#001100" stroke="#00ff00" stroke-width="1" />
+                    </svg>
+                </div>
+                
+                <div class="server">
+                    <div class="server-title">Frontend</div>
+                    <svg width="80" height="80" viewBox="0 0 24 24">
+                        <rect x="2" y="2" width="20" height="20" fill="none" stroke="#00ff00" stroke-width="1" />
+                        <line x1="2" y1="6" x2="22" y2="6" stroke="#00ff00" stroke-width="1" />
+                        <rect x="5" y="10" width="14" height="2" fill="#00ff00" stroke="#00ff00" stroke-width="0.5" />
+                        <rect x="5" y="14" width="14" height="2" fill="#00ff00" stroke="#00ff00" stroke-width="0.5" />
+                    </svg>
+                </div>
+                
+                <div class="server">
+                    <div class="server-title">Backend</div>
+                    <svg width="80" height="80" viewBox="0 0 24 24">
+                        <rect x="2" y="2" width="20" height="20" fill="none" stroke="#00ff00" stroke-width="1" />
+                        <circle cx="12" cy="12" r="6" fill="none" stroke="#00ff00" stroke-width="1" />
+                        <circle cx="12" cy="12" r="2" fill="#00ff00" />
+                    </svg>
+                </div>
+                
+                <div id="packet-container"></div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            
+            <div class="controls">
+                <button id="btn-step" class="btn-step">Следующий шаг ▶</button>
+            </div>
+        </div>
+        
+        <!-- Request Boundary Visualization -->
+        <div class="panel">
+            <h3 class="panel-header">Визуализация границ запроса</h3>
+            <div class="request-visualization">
+                <div class="parsing-diagram">
+                    <div class="parsing-row">
+                        <div class="parsing-label">Исходный запрос</div>
+                        <div class="parsing-content" id="raw-request">POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G</div>
+                    </div>
+                    <div class="parsing-row">
+                        <div class="parsing-label">Интерпретация Frontend</div>
+                        <div class="parsing-content highlight-content" id="frontend-interpretation">
+                            <div class="highlight-overlay" style="width: 80%;"></div>
+                            POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G
+                        </div>
+                    </div>
+                    <div class="parsing-row">
+                        <div class="parsing-label">Интерпретация Backend</div>
+                        <div class="parsing-content highlight-content" id="backend-interpretation">
+                            <div class="highlight-overlay" style="width: 60%;"></div>
+                            POST / HTTP/1.1
+Host: example.com
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+G
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Attack Explanation -->
+        <div class="panel">
+            <h3 class="panel-header">Объяснение атаки</h3>
+            <div class="explanation" id="explanation-container">
+                <p>HTTP Request Smuggling — это техника атаки, которая использует несоответствия в интерпретации HTTP-запросов между прокси-серверами и серверами приложений.</p>
+                <p>В случае <span class="highlight">CL.TE</span>:</p>
+                <ul>
+                    <li>Frontend-сервер обрабатывает заголовок <span class="highlight">Content-Length</span></li>
+                    <li>Backend-сервер обрабатывает заголовок <span class="highlight">Transfer-Encoding: chunked</span></li>
+                    <li>Это несоответствие позволяет части запроса быть "переброшенной" и внедренной в начало следующего запроса</li>
+                </ul>
+                <p>Нажмите "Следующий шаг" для пошаговой визуализации атаки.</p>
+            </div>
+        </div>
+        
+        <!-- Real-time Log Analysis -->
+        <div class="panel">
+            <h3 class="panel-header">Анализ логов в реальном времени</h3>
+            <div class="panel-content">
+                <div class="log-filter">
+                    <label for="session-filter">Фильтр по сессии:</label>
+                    <select id="session-filter" class="select-field">
+                        <option value="all">Все сессии</option>
+                        <option value="current">Только моя сессия</option>
+                    </select>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab active" data-tab="tab-all-logs">Все логи</button>
+                    <button class="tab" data-tab="tab-attack-logs">Логи атак</button>
+                    <button class="tab" data-tab="tab-session-logs">Логи сессий</button>
+                </div>
+                
+                <div class="tab-content active" id="tab-all-logs">
+                    <div class="log-container" id="realtime-logs">
+                        <p class="log-line">Загрузка логов...</p>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="tab-attack-logs">
+                    <div id="attack-logs-container" class="attack-logs">
+                        <div class="attack-logs-header">
+                            <div class="attack-log-col">Пользователь</div>
+                            <div class="attack-log-col">Индикаторы</div>
+                            <div class="attack-log-col">Статус</div>
+                            <div class="attack-log-col">Последняя активность</div>
+                        </div>
+                        <div id="attack-logs-content">
+                            <p class="log-line">Загрузка данных об атаках...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="tab-session-logs">
+                    <div id="session-stats">
+                        <h4>Статистика сессий:</h4>
+                        <div id="session-stats-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>HTTP Request Smuggling Lab | Интерактивная среда обучения | 2025</p>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
